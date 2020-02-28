@@ -83,6 +83,11 @@ def move_piece(game_id):
         return_data = {
             "board": game.board.to_dict(),
             "id": game.id,
+            "players":
+                {
+                    "white": str(game.player1),
+                    "black": str(game.player2),
+                },
             "next_move": game.get_next_move(),
         }
         logger.info(f"Finished moving piece: {return_data}")
@@ -104,6 +109,11 @@ def get_game_info(game_id):
         return_data = {
             "board": game.board.to_dict(),
             "id": game.id,
+            "players":
+                {
+                    "white": str(game.player1),
+                    "black": str(game.player2),
+                },
             "next_move": game.get_next_move(),
         }
         logger.info(f"Finished getting game data: {return_data}")
@@ -122,9 +132,12 @@ def get_games():
         for game_id, game in GAMES.items():
             return_data.append(
                 {
-                    "board": game.board.to_dict(),
                     "id": game.id,
-                    "next_move": game.get_next_move(),
+                    "players":
+                        {
+                            "white": str(game.player1),
+                            "black": str(game.player2),
+                        },
                 }
             )
         logger.info(f"Get games returned {len(return_data)} games")

@@ -82,8 +82,8 @@
                 <div class="row" id="sidebaritem">
                     <div class="col">
                         <form>
-                            <h4>Clear Match</h4>
-                            <button id="btnreset" type="submit" class="btn btn-dark">Reset</button>
+                            <h4>Delete Match</h4>
+                            <button id="btnreset" type="submit" class="btn btn-dark">Delete</button>
                         </form>
                     </div>                                    
                 </div>
@@ -91,7 +91,7 @@
         </div>
         <div class="container main">
             <div class="row">
-                <div class="col-6">
+                <div class="col-sm">
 
                         <table>
                                 <tbody>
@@ -211,11 +211,112 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <br>
+                </div>
+                <div class="col-sm">
+                    <div class="card">
+                        <div class="card-header">
+                          Featured
+                        </div>
+                        <div class="card-body">
+                          <h5 class="card-title">Special title treatment</h5>
+                          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        </div>
+                      </div>
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Wite</th>
+                            <th scope="col">Black</th>
+                            <th scope="col"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td><button type="button" class="btn btn-info">Info</button></td>
+                          </tr>
+                          <tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td><button type="button" class="btn btn-info">Info</button></td>
+                          </tr>
+                          <tr>
+                            <th scope="row">3</th>
+                            <td>Larry</td>
+                            <td>the Bird</td>
+                            <td><button type="button" class="btn btn-info">Info</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="">
+                <div class="row">
+                    <div class="col">
+
+                    </div>
                 </div>
             </div>
         </div>
         <script>
+
+            //Load game info
+            var theRequest = new XMLHttpRequest();
+            var lastgame = sessionStorage.getItem("game");
+            var url = "http://localhost:5000/game/"+lastgame;
+            if(lastgame != null){
+                theRequest.open('GET',url);
+                theRequest.onload = function(){
+                    var theData = JSON.parse(theRequest.responseText);
+                    if(theData.error){
+                        sessionStorage.removeItem("game");
+                        alert("Start a nuew Game");
+                    }else{
+                        Object.keys(theData.board).forEach(function(keyn) {
+                        value = theData.board[keyn];
+                        Object.keys(value).forEach(function(keyl) {
+                            ficha = value[keyl];
+                            if(ficha!='None'){
+                                document.getElementById(keyl+""+keyn).innerHTML =`<img src="/static/img/${ficha}.png">`;
+                            }
+                        });
+                    });
+                    
+                var nextP = document.getElementById("nextp");
+                var p1 = document.getElementById("rp1");
+                var p2 = document.getElementById("rp2");
+                var op1 = document.getElementById("op1");
+                var op2 = document.getElementById("op2");
+                nextP.innerHTML = `<th>Next To Play: ${theData.next_move}</th>`;
+                p1.innerHTML = `<th>White Pieces: ${theData.players.white}</th>`;
+                p2.innerHTML = `<th>White Pieces: ${theData.players.black}</th>`;
+                op1.innerHTML = `<option>${theData.players.white}</option>`;
+                op2.innerHTML = `<option>${theData.players.black}</opttion>`;
+                };
+            };
+            theRequest.send();                
+            }
+            var theRequest2 = new XMLHttpRequest();
+            theRequest2.open('GET','http://localhost:5000/games');
+            theRequest2.onload = function(){
+                var res= JSON.parse(theRequest2.responseText);
+                console.log(res)
+                Object.keys(res).forEach(function(key){
+                    value=res[key]
+                    document.getElementById().innerHTML =``;
+
+                })
+            };
+            theRequest2.send(); 
+
+
+            //Start a new game
             var btnstart = document.getElementById("btnstart");
             btnstart.addEventListener('click', function(event){
                 player1 = document.getElementById('p1').value;
@@ -226,13 +327,12 @@
                 theRequest.onload = function(){
                     var resData= JSON.parse(theRequest.responseText);
                     sessionStorage.setItem("game",resData.id);
-                    sessionStorage.setItem("player1",resData.players.white);
-                    sessionStorage.setItem("player2",resData.players.black);
                 };
                 theRequest.send(JSON.stringify({ "player1": {"name": player1 }, "player2": {"name": player2 }}));
                 
             });
 
+            //Make a move
             var btnplay = document.getElementById("btnplay");
             btnplay.addEventListener('click', function(event){
                 playername = document.getElementById('whoplay').value;
@@ -257,48 +357,22 @@
                 
             });
 
+            //Delete Game
             var btnreset = document.getElementById("btnreset");
             btnreset.addEventListener('click', function(event){
-                sessionStorage.clear();
+                var lastgame = sessionStorage.getItem("game");
+                var url = "http://localhost:5000/game/"+lastgame;
+                var theRequest = new XMLHttpRequest();
+                theRequest.open('DELETE', url,true);
+                theRequest.onload = function(){
+                    var resData= JSON.parse(theRequest.responseText);
+                    console.log(resData)
+                }
+                theRequest.send(null);
+                sessionStorage.removeItem("game");
             });
 
-            var theRequest = new XMLHttpRequest();
-            var lastgame = sessionStorage.getItem("game");
-            var newp1 = sessionStorage.getItem("player1");
-            var newp2 = sessionStorage.getItem("player2");
-            var url = "http://localhost:5000/game/"+lastgame;
-            if(lastgame != null){
-                theRequest.open('GET',url);
-            theRequest.onload = function(){
-                var theData = JSON.parse(theRequest.responseText);
-                if(theData.error){
-                    sessionStorage.clear();
-                    alert("Start a nuew Game");
-                }else{
-                    Object.keys(theData.board).forEach(function(keyn) {
-                    value = theData.board[keyn];
-                    Object.keys(value).forEach(function(keyl) {
-                        ficha = value[keyl];
-                        if(ficha!='None'){
-                            document.getElementById(keyl+""+keyn).innerHTML =`<img src="/static/img/${ficha}.png">`;
-                        }
-                    });
-                });
-                
-                var nextP = document.getElementById("nextp");
-                var p1 = document.getElementById("rp1");
-                var p2 = document.getElementById("rp2");
-                var op1 = document.getElementById("op1");
-                var op2 = document.getElementById("op2");
-                nextP.innerHTML = `<th>Next To Play: ${theData.next_move}</th>`;
-                p1.innerHTML = `<th>White Pieces: ${newp1}</th>`;
-                p2.innerHTML = `<th>White Pieces: ${newp2}</th>`;
-                op1.innerHTML = `<option>${newp1}</option>`;
-                op2.innerHTML = `<option>${newp2}</opttion>`;
-                };
-            };
-            theRequest.send();                
-            }
+
         </script>
     </body>
 </html>
